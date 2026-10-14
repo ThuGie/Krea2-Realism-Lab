@@ -28,11 +28,12 @@ function Find-ComfyPython([string]$Root, [string]$ExplicitPath) {
 function Install-Krea2Lab([string]$Root, [string]$Source) {
     $target = Join-Path $Root 'custom_nodes\comfyui_krea2_lab'
     New-Item -ItemType Directory -Force -Path $target | Out-Null
-    foreach ($name in @('__init__.py', 'detector_worker.py')) {
+    foreach ($name in @('__init__.py', 'detector_worker.py', 'voting_export.py')) {
         Copy-Item -LiteralPath (Join-Path $Source "comfyui_krea2_lab\$name") -Destination $target -Force
     }
     # Detector configuration belongs to the chosen installation, not this checkout.
     Copy-Item -LiteralPath (Join-Path $Source 'comfyui_krea2_lab\web') -Destination $target -Recurse -Force
+    Copy-Item -LiteralPath (Join-Path $Source 'comfyui_krea2_lab\voting_site') -Destination $target -Recurse -Force
     return $target
 }
 
@@ -55,6 +56,13 @@ function Get-ComfyLaunchArguments([string]$Root, [string]$StateDirectory, [int]$
     if ($Cpu) { $arguments += '--cpu' }
     if ($Isolated) { $arguments += @('--disable-all-custom-nodes', '--whitelist-custom-nodes', 'comfyui_krea2_lab') }
     return $arguments
+}
+
+function Get-KreaBackendHash([string]$Plugin) {
+    $bytes = [System.IO.File]::ReadAllBytes((Join-Path $Plugin '__init__.py')) + [System.IO.File]::ReadAllBytes((Join-Path $Plugin 'voting_export.py'))
+    $algorithm = [System.Security.Cryptography.SHA256]::Create()
+    try { return ([System.BitConverter]::ToString($algorithm.ComputeHash([byte[]]$bytes))).Replace('-', '').ToLowerInvariant() }
+    finally { $algorithm.Dispose() }
 }
 
 function Quote-ProcessArgument([string]$Value) {

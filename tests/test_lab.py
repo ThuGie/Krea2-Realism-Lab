@@ -40,6 +40,8 @@ class LabTests(unittest.TestCase):
         sys.modules.update(modules)
         spec=importlib.util.spec_from_file_location('lab',Path(__file__).parents[1]/'comfyui_krea2_lab/__init__.py')
         cls.lab=importlib.util.module_from_spec(spec)
+        cls.old['lab']=sys.modules.get('lab')
+        sys.modules['lab']=cls.lab
         spec.loader.exec_module(cls.lab)
         cls.real_start_detector=staticmethod(cls.lab.start_detector)
         cls.lab.start_detector=Mock(return_value=True)

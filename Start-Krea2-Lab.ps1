@@ -47,7 +47,7 @@ try {
     $root = Resolve-ComfyRoot $ComfyPath
     $python = Find-ComfyPython $root $PythonPath
     $plugin = Install-Krea2Lab $root $PSScriptRoot
-    $sourceHash = (Get-FileHash -LiteralPath (Join-Path $plugin '__init__.py') -Algorithm SHA256).Hash.ToLowerInvariant()
+    $sourceHash = Get-KreaBackendHash $plugin
     $settings = [ordered]@{ ComfyPath=$root; PythonPath=$python; Port=$Port; OwnedProcessId=$null }
     if ($PrepareOnly) {
         Write-Host "Installed tester in $plugin. Prepare-only: no server started or stopped."

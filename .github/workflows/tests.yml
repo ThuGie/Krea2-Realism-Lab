@@ -13,6 +13,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_sqlite
+          coverage: none
       - run: python -m unittest discover -s tests -v
       - run: node tests/test_auto_page.cjs
+      - run: node tests/test_help.cjs
+      - run: node --check comfyui_krea2_lab/voting_site/public/app.js
+      - run: node --check comfyui_krea2_lab/voting_site/public/admin.js
       - run: powershell -NoProfile -ExecutionPolicy Bypass -File tests/test_launcher.ps1

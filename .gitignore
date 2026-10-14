@@ -10,4 +10,5 @@ output/
 models/
 launcher.json
 dist/
+.tools/
 .DS_Store

@@ -2,6 +2,7 @@ import hashlib
 import json
 import math
 import itertools
+import asyncio
 import os
 import subprocess
 import sys
@@ -17,9 +18,10 @@ import comfy.utils
 import folder_paths
 import nodes
 from server import PromptServer
+from .voting_export import build_voting_export
 
 LOCK = threading.Lock()
-BACKEND_HASH = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+BACKEND_HASH = hashlib.sha256(Path(__file__).read_bytes() + (Path(__file__).parent / 'voting_export.py').read_bytes()).hexdigest()
 PAUSE = threading.Event()
 DETECTOR_PROCESS = None
 DEFAULT_STRENGTHS = '0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2'
@@ -392,6 +394,52 @@ routes = PromptServer.instance.routes
 @routes.get('/krea2-lab')
 async def page(request):
     return web.FileResponse(Path(__file__).parent / 'web' / 'index.html')
+
+
+@routes.get('/krea2-lab/help.js')
+async def help_script(request):
+    return web.FileResponse(Path(__file__).parent / 'web' / 'help.js')
+
+
+@routes.get('/krea2-lab/runs')
+async def export_runs(request):
+    with LOCK:
+        runs = [json.loads(path.read_text(encoding='utf-8')) for path in (root() / 'sweeps').glob('*.json')]
+    return web.json_response([dict(id=run['id'], experiment=run['configuration']['experiment'],
+        status=run['status'], generated=run['succeeded'], total=run['total'], updated=run.get('updated', 0))
+        for run in sorted(runs, key=lambda run: run.get('updated', 0), reverse=True)])
+
+
+@routes.post('/krea2-lab/voting-export')
+async def voting_export(request):
+    data = await request.json()
+    key = data.get('run_id', '')
+    record_path(key)
+    include_disabled, include_reviews = data.get('include_disabled', False), data.get('include_reviews', False)
+    if not isinstance(include_disabled, bool) or not isinstance(include_reviews, bool):
+        raise web.HTTPBadRequest(text='Export options must be true or false')
+    path = root() / 'sweeps' / (key + '.json')
+    if not path.exists():
+        raise web.HTTPNotFound(text='Run not found')
+    with LOCK:
+        run = json.loads(path.read_text(encoding='utf-8'))
+    try:
+        archive = await asyncio.to_thread(build_voting_export, folder_paths.get_output_directory(), run,
+            disabled_pairs(), include_disabled, include_reviews)
+    except ValueError as error:
+        raise web.HTTPBadRequest(text=str(error)) from error
+    return web.json_response({'url': '/krea2-lab/voting-download/' + archive.name})
+
+
+@routes.get('/krea2-lab/voting-download/{name}')
+async def voting_download(request):
+    name = request.match_info['name']
+    if not name.startswith('krea2-voting-') or not name.endswith('.zip') or any(c not in 'abcdefghijklmnopqrstuvwxyz0123456789-.' for c in name):
+        raise web.HTTPBadRequest(text='Invalid export filename')
+    path = root() / 'exports' / name
+    if not path.is_file():
+        raise web.HTTPNotFound()
+    return web.FileResponse(path, headers={'Content-Disposition': 'attachment; filename="' + name + '"'})
 
 
 @routes.get('/krea2-lab/installation')
