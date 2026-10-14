@@ -24,6 +24,20 @@ setTimeout(async()=>{
   assert.equal(vm.runInContext("speedCompare(null,10,'slow')",context),1);
   assert.equal(vm.runInContext("speedCompare(2,undefined,'fast')",context),-1);
 
+  vm.runInContext("trials=[{id:'one',settings:{experiment:'First',sampler:'euler',scheduler:'normal',lora:'A'},review:{},images:[{}]},{id:'two',settings:{experiment:'Second',sampler:'euler',scheduler:'normal',lora:'B'},review:{score:4},images:[{}]},{id:'three',settings:{experiment:'First',sampler:'euler',scheduler:'normal',lora:'C'},review:{},images:[{}]}];",context);
+  vm.runInContext("toggleComparison('one');toggleComparison('two');toggleComparison('three')",context);
+  assert.equal(vm.runInContext('comparisonIds.size',context),2);
+  assert.equal(elements.get('compareOpen').disabled,false);assert(elements.get('gallery').innerHTML.includes('data-compare'));
+  elements.get('onlyUnrated').checked=true;vm.runInContext('render()',context);
+  assert.equal(elements.get('count').textContent,2);vm.runInContext("noteDrafts.set('one','unsaved draft');render()",context);assert(elements.get('gallery').innerHTML.includes('unsaved draft'));
+  elements.get('onlyUnrated').checked=false;elements.get('experimentFilter').value='Second';vm.runInContext('render()',context);
+  assert.equal(elements.get('count').textContent,1);
+  elements.get('experimentFilter').value='';
+  elements.get('compareClear').onclick();assert.equal(elements.get('compareOpen').disabled,true);
+  vm.runInContext('trials=Array.from({length:60},(_,i)=>({id:String(i),settings:{sampler:"euler",scheduler:"normal"},review:{},images:[{}]}));render()',context);
+  assert.equal((elements.get('gallery').innerHTML.match(/<article /g)||[]).length,48);
+  elements.get('loadMore').onclick();assert.equal((elements.get('gallery').innerHTML.match(/<article /g)||[]).length,60);
+  vm.runInContext('trials=[];galleryLimit=48',context);await vm.runInContext('refresh()',context);
   elements.get('encoder').value=catalog.encoders[0];elements.get('vae').value=catalog.vaes[0];
   const graph=vm.runInContext('automaticGraph()',context);
   assert.equal(graph['1'].class_type,'Krea2LabSweep');

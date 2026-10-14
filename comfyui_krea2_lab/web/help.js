@@ -1,4 +1,12 @@
 const OPTION_HELP = {
+  loadMore: ['Load more images','Adds the next 48 matching images to the gallery. Sorting applies to all matching results before pagination, so fastest or highest-rated images appear first across the entire collection. Filters reset the gallery to its first page.'],
+  experimentFilter: ['Experiment filter','Show saved images from one named experiment, or choose the empty first entry for all experiments. Combines with text search and unreviewed filtering. The leaderboard and summary follow these filters; the website export run is selected separately.'],
+  onlyUnrated: ['Unreviewed images','Show only images without your local realism rating. Use this to work through a large run. Rated images disappear from this view after saving; turn the filter off to see them again.'],
+  gallerySize: ['Gallery image size','Choose compact cards for scanning, comfortable cards for normal reviewing, or large images for detail. This preference is remembered in this browser. Click any image to view it at full size.'],
+  compareOpen: ['Compare two images','Use Compare image on two gallery cards, then Compare selected to view them side by side. Blind review hides their generation labels here too. Selection stays while filtering; clear it to start another comparison.'],
+  compareClear: ['Clear comparison','Deselect both comparison images without changing their scores, notes or generated files. You can then select a different pair of images.'],
+  compareClose: ['Close comparison','Return to the gallery. Your selected images remain selected so you can reopen the same comparison or clear them and choose another pair.'],
+
   reviewScore: ['Realism rating','Your own score from 1 to 5. Judge believable anatomy, skin, materials and lighting rather than liking the subject. Ratings are saved locally and form the human-review leaderboard. They are never treated as public votes in an exported site.'],
   reviewNotes: ['Review notes','Optional private observations about this trial, such as malformed hands or plastic-looking skin. Save notes after editing. They stay out of a voting export unless Include my local reviews and notes is explicitly checked.'],
   reviewSave: ['Save notes','Saves the text beside this image with its existing human rating. Choose a rating first. It does not start generation or change the configuration.'],

@@ -56,6 +56,7 @@ Each selected combination runs once per prompt/seed. This tests individual LoRAs
 - Full-resolution previews and complete generation settings.
 - Human realism ratings from 1 to 5, with saved notes.
 - Blind review that hides configuration labels.
+- Workspace with separate setup and run controls, experiment and unreviewed filters, adjustable image size, 48-image pagination, and two-image comparison that respects blind review. Unsaved review notes survive automatic refreshes within the page session.
 - Filterable gallery and a collapsed, scrollable configuration leaderboard. Sort fastest or slowest by recorded generation time; configurations use mean time, and missing timings appear last. Exported voting galleries also support whole-run speed sorting. Timing depends on hardware, warm-up, caching, image dimensions and batch size.
 - JSON/CSV result exports.
 - Per-run standalone PHP voting-site exports with images, SQLite, community ratings, leaderboards and administration.
