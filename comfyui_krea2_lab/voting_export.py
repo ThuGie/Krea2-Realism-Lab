@@ -100,6 +100,8 @@ def build_voting_export(output_directory, run, disabled=(), include_disabled=Fal
                     continue
                 # Export generation settings, never local paths, executable graphs or detector confidence.
                 public_settings = {field: settings[field] for field in ('lora','strength','seed','steps','cfg','sampler','scheduler','trigger','negative')}
+                seconds = trial.get('seconds')
+                public_settings['generation_seconds'] = seconds if isinstance(seconds, (int, float)) and not isinstance(seconds, bool) and 0 < seconds < float('inf') else None
                 public_settings.update(model=settings['graph']['1']['inputs']['unet_name'],
                     width=run['configuration']['width'], height=run['configuration']['height'])
                 group = {field: public_settings[field] for field in ('model','lora','strength','steps','cfg','sampler','scheduler','width','height')}

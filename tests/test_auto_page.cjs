@@ -19,6 +19,11 @@ const context = vm.createContext({document:{getElementById:id=>{assert(elements.
   setInterval(){},setTimeout,console,URLSearchParams,crypto:{randomUUID:()=> 'test'},localStorage:{getItem(){return null},setItem(){}}});
 vm.runInContext(html.split('<script>')[1].split('</script>')[0], context);
 setTimeout(async()=>{
+  assert.equal(vm.runInContext("speedCompare(2,10,'fast')",context),-8);
+  assert.equal(vm.runInContext("speedCompare(2,10,'slow')",context),8);
+  assert.equal(vm.runInContext("speedCompare(null,10,'slow')",context),1);
+  assert.equal(vm.runInContext("speedCompare(2,undefined,'fast')",context),-1);
+
   elements.get('encoder').value=catalog.encoders[0];elements.get('vae').value=catalog.vaes[0];
   const graph=vm.runInContext('automaticGraph()',context);
   assert.equal(graph['1'].class_type,'Krea2LabSweep');

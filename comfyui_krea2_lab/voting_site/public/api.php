@@ -46,18 +46,22 @@ try {
     if ($action === 'trials' && $method === 'GET') {
         $after = max(-1, (int)($_GET['after'] ?? -1));
         $unrated = ($_GET['unrated'] ?? '') === '1';
-        $query = 'SELECT t.*, v.score AS my_score FROM trials t LEFT JOIN votes v ON v.trial_id=t.id AND v.voter=:voter WHERE t.position>:after';
+        $speed = in_array($_GET['sort'] ?? '', ['fast', 'slow'], true);
+        $direction = ($_GET['sort'] ?? '') === 'slow' ? 'DESC' : 'ASC';
+        $query = 'SELECT t.*, v.score AS my_score FROM trials t LEFT JOIN votes v ON v.trial_id=t.id AND v.voter=:voter WHERE ' . ($speed ? '1=1' : 't.position>:after');
         if ($unrated) $query .= ' AND v.score IS NULL';
-        $query .= ' ORDER BY t.position LIMIT 36';
+        $query .= $speed ? " ORDER BY (json_extract(t.settings,'$.generation_seconds') IS NULL), json_extract(t.settings,'$.generation_seconds') $direction, t.position LIMIT 36 OFFSET :offset" : ' ORDER BY t.position LIMIT 36';
         $statement = $db->prepare($query);
-        $statement->execute(['voter' => $voter, 'after' => $after]);
+        $statement->bindValue(':voter', $voter);
+        $statement->bindValue($speed ? ':offset' : ':after', $speed ? $after + 1 : $after, PDO::PARAM_INT);
+        $statement->execute();
         $items = [];
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $items[] = ['id' => $row['id'], 'position' => (int)$row['position'], 'prompt' => $row['prompt'],
                 'images' => json_decode($row['images'], true), 'settings' => json_decode($row['settings'], true),
                 'my_score' => $row['my_score'] === null ? null : (int)$row['my_score']];
         }
-        respond(['trials' => $items, 'next' => $items ? end($items)['position'] : $after, 'more' => count($items) === 36]);
+        respond(['trials' => $items, 'next' => $speed ? $after + count($items) : ($items ? end($items)['position'] : $after), 'more' => count($items) === 36]);
     }
     if ($action === 'vote' && $method === 'POST') {
         $id = $data['trial_id'] ?? '';

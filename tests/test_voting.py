@@ -44,7 +44,7 @@ def fixture(output):
         trial=dict(id=key,settings=dict(lora=lora,strength=0 if lora=='NONE' else .5,sampler='euler',
             scheduler=scheduler,prompt=configuration['prompts'][0],seed=42,steps=8,cfg=1,trigger='',negative='',
             experiment=experiment,graph=graph),images=[dict(subfolder='krea2_lab',filename=key+'.png',type='output')],
-            review={'score':5,'notes':'PRIVATE LOCAL NOTE'})
+            seconds={'a':10,'b':2}.get(letter),review={'score':5,'notes':'PRIVATE LOCAL NOTE'})
         (lab/(key+'.json')).write_text(json.dumps(trial))
         if letter!='e':(lab/(key+'.png')).write_bytes(PNG)
     return run
@@ -139,6 +139,11 @@ class VotingExportTests(unittest.TestCase):
         self.assertEqual(float(results['images'][0]['mean']),4)
         _,raw=request('trials');trials=json.loads(raw)['trials']
         self.assertEqual(next(t for t in trials if t['id']=='a'*64)['my_score'],3)
+        for order,expected in [('fast',['b','a']),('slow',['a','b'])]:
+            _,raw=request('trials&sort='+order)
+            self.assertEqual([t['id'][0] for t in json.loads(raw)['trials']],expected)
+            _,raw=request('trials&sort='+order+'&after=0')
+            self.assertEqual([t['id'][0] for t in json.loads(raw)['trials']],expected[1:])
         key=re.search(r'Admin access key: `([^`]+)`',(target/'HOSTING.md').read_text()).group(1)
         self.assertEqual(request('admin-login',{'key':'wrong'},token)[0],403)
         self.assertEqual(request('admin-login',{'key':key},token)[0],200)
@@ -155,3 +160,4 @@ class VotingExportTests(unittest.TestCase):
 
 
 if __name__=='__main__':unittest.main()
+

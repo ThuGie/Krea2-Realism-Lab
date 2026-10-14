@@ -17,7 +17,7 @@ async function load(reset=false) {
   $('more').disabled = true;
   try {
     if (reset) { after=-1; records=[]; }
-    const data = await api('trials',undefined,'&after='+after+'&unrated='+($('unrated').checked?'1':'0'));
+    const data = await api('trials',undefined,'&after='+after+'&sort='+$('sort').value+'&unrated='+($('unrated').checked?'1':'0'));
     after = data.next; records.push(...data.trials); render(); $('more').hidden=!data.more;
     $('message').textContent = records.length?'':'No more images to rate. Change the filter or view the results.';
   } finally { $('more').disabled=false; }
@@ -46,11 +46,12 @@ $('gallery').onclick=event=>safely(async()=>{
 $('winners').onclick=event=>{if(event.target.tagName==='IMG')preview(event.target.src)};
 $('more').onclick=()=>safely(()=>load());
 $('blind').onchange=render;
+$('sort').onchange=()=>safely(()=>load(true));
 $('unrated').onchange=()=>safely(()=>load(true));
 $('resultsTab').onclick=()=>safely(async()=>{$('voting').hidden=true;$('results').hidden=false;await results()});
 $('voteTab').onclick=()=>{$('voting').hidden=false;$('results').hidden=true};
 $('closeZoom').onclick=()=>$('zoom').close();
 $('closeHelp').onclick=()=>$('helpDialog').close();
-const help={vote:'Returns to the image rating gallery. Your votes remain saved when switching between views.',more:'Loads the next page of up to 36 images from this exported run. Images already loaded remain visible. Use Only images I have not rated to focus on new reviews.',blind:'Hides model, LoRA and sampling labels so you can judge the image without being influenced by the configuration. The results page reveals labels.',unrated:'Shows images with no vote from this browser. Your identity is a random cookie; clearing it or using another browser creates another identity.',rating:'Rate photographic believability, not whether you like the subject. Check faces, hands, anatomy, skin texture, materials, shadows and lighting. One vote per browser per image is saved; clicking a different number updates that vote.',results:'Public votes are averaged per image and per generation configuration. All votes have equal weight. More votes and coverage across more images make comparisons more useful. Local ComfyUI reviews are never mixed into public totals.'};
+const help={sort:'Sorts the entire run by recorded generation time, fastest or slowest first. Missing timings appear last. Times depend on the original hardware, warm-up, caching, resolution and batch size; they are not a universal performance benchmark.',vote:'Returns to the image rating gallery. Your votes remain saved when switching between views.',more:'Loads the next page of up to 36 images from this exported run. Images already loaded remain visible. Use Only images I have not rated to focus on new reviews.',blind:'Hides model, LoRA and sampling labels so you can judge the image without being influenced by the configuration. The results page reveals labels.',unrated:'Shows images with no vote from this browser. Your identity is a random cookie; clearing it or using another browser creates another identity.',rating:'Rate photographic believability, not whether you like the subject. Check faces, hands, anatomy, skin texture, materials, shadows and lighting. One vote per browser per image is saved; clicking a different number updates that vote.',results:'Public votes are averaged per image and per generation configuration. All votes have equal weight. More votes and coverage across more images make comparisons more useful. Local ComfyUI reviews are never mixed into public totals.'};
 document.addEventListener('click',event=>{const button=event.target.closest('[data-help]');if(button){$('helpText').textContent=help[button.dataset.help];$('helpDialog').showModal()}});
 safely(async()=>{const data=await api('meta');csrf=data.csrf;$('title').textContent=data.manifest.title;$('coverage').textContent=data.manifest.trials+' images in this run';await load()});
