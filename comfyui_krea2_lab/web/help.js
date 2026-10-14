@@ -1,4 +1,7 @@
 const OPTION_HELP = {
+  compareMode: ['Comparison view','With exactly two selected images, switch between the regular grid and an A/B slider. The slider overlays both images in the same frame: drag left/right to reveal different portions. With any other image count, only the grid is available.'],
+  imageSplit: ['A/B image slider','Drag across the image, or focus the slider and use Left/Right arrow keys. Home reveals only B; End reveals only A. Both images keep their proportions in the same frame. Different aspect ratios show letterboxing, and the tool does not align features automatically.'],
+  swapSlider: ['Swap comparison images','Switch which selected image is A on the left and B on the right. The split position stays the same. This changes only the view, not image files, ratings, comparison selection or generation settings.'],
   readingFont: ['Reading font','Switch between your system font and locally bundled OpenDyslexic. No font installation or internet connection is needed. Choose whichever feels most comfortable; the preference applies to this workspace and is remembered in this browser.'],
   uiTheme: ['Appearance','Choose a dark background, a light background, or a high-contrast dark design with brighter text and stronger borders. This changes only the interface; generated images retain their original colors.'],
   accentColor: ['Design color','Choose blue, green, violet, amber, rose or neutral accents for buttons, focus indicators and selections. Combine with any appearance mode. Generated images and their saved files are unchanged.'],

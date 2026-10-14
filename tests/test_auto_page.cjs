@@ -28,6 +28,17 @@ setTimeout(async()=>{
   vm.runInContext("toggleComparison('one');toggleComparison('two');toggleComparison('three')",context);
   assert.equal(vm.runInContext('comparisonIds.size',context),3);
   assert.equal(elements.get('compareOpen').disabled,false);assert(elements.get('gallery').innerHTML.includes('data-compare'));
+  vm.runInContext("comparisonIds.delete('three');renderComparison()",context);
+  assert.equal(elements.get('sliderControls').hidden,false);
+  elements.get('compareMode').value='slider';elements.get('compareMode').onchange();
+  assert.equal(elements.get('sliderView').hidden,false);
+  elements.get('imageSplit').value='25';elements.get('imageSplit').oninput();
+  assert.equal(elements.get('sliderLayer').style.clipPath,'inset(0 75% 0 0)');
+  assert.equal(elements.get('splitStatus').textContent,'A 25% · B 75%');
+  vm.runInContext("comparisonIds.add('three');renderComparison()",context);
+  assert.equal(elements.get('sliderControls').hidden,true);
+  assert.equal(elements.get('sliderView').hidden,true);
+  assert.equal(elements.get('comparisonImages').hidden,false);
   elements.get('onlyUnrated').checked=true;vm.runInContext('render()',context);
   assert.equal(elements.get('count').textContent,2);vm.runInContext("noteDrafts.set('one','unsaved draft');render()",context);assert(elements.get('gallery').innerHTML.includes('unsaved draft'));
   elements.get('onlyUnrated').checked=false;elements.get('experimentFilter').value='Second';vm.runInContext('render()',context);

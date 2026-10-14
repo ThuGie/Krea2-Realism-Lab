@@ -42,7 +42,7 @@ Each selected combination runs once per prompt and seed. LoRAs are tested indivi
 ## Review at your own pace
 
 - Rate realism from **1–5** and keep private notes.
-- Compare **2–8 images** together, choose the columns and zoom into details.
+- Compare **2–8 images** together, choose the columns and zoom into details. With exactly two images, use the **A/B slider** to drag between overlapping views.
 - Sort by rating or **generation speed**; filter by experiment or unreviewed images.
 - Use blind review to hide generation labels.
 - Disable incompatible sampler/scheduler pairs while a run continues; import or export your exclusion list.

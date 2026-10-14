@@ -23,6 +23,9 @@ Each selected combination runs once per prompt/seed. This tests individual LoRAs
 
 ## Review and compare
 
+For an overlay comparison, select exactly **two** images, click **Compare selected**, then choose **View → A/B slider**. Drag left or right across the image to reveal each version. You can also focus the slider and use the arrow keys, Home or End. **Swap A / B** reverses the images. Selecting any other image count keeps the regular grid view. Different image proportions are letterboxed in a shared frame; features are not automatically aligned.
+
+
 - Full-resolution previews and complete generation settings.
 - Human realism ratings from 1 to 5, with saved notes.
 - Blind review that hides configuration labels.
