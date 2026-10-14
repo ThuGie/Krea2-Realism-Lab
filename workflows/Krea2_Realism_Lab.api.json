@@ -1,0 +1,32 @@
+{
+  "1": {
+    "class_type": "Krea2LabSweep",
+    "inputs": {
+      "encoder": "qwen3vl_4b_fp8_scaled.safetensors",
+      "vae_name": "qwen_image_vae.safetensors",
+      "strengths": "0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2",
+      "prompts": "Candid photograph of an adult woman at a cafe window, natural skin texture, detailed hands holding a ceramic cup, soft daylight, unretouched photography.",
+      "seeds": "42",
+      "steps": 8,
+      "cfg": 1.0,
+      "width": 1024,
+      "height": 1024,
+      "experiment": "Krea2 automatic sweep",
+      "trigger_map": "{}",
+      "negative": "",
+      "test_models": true,
+      "test_loras": true,
+      "test_strengths": true,
+      "test_samplers": true,
+      "test_schedulers": true,
+      "fixed_model": "AUTO",
+      "fixed_lora": "NONE",
+      "fixed_strength": 0.75,
+      "fixed_sampler": "AUTO",
+      "fixed_scheduler": "AUTO",
+      "include_baseline": true,
+      "step_values": "",
+      "cfg_values": ""
+    }
+  }
+}

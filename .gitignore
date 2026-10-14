@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.zip
+*.log
+*.download
+comfyui_krea2_lab/detector_config.json
+output/
+models/
+launcher.json
+dist/
+.DS_Store
