@@ -56,7 +56,9 @@ Each selected combination runs once per prompt/seed. This tests individual LoRAs
 - Full-resolution previews and complete generation settings.
 - Human realism ratings from 1 to 5, with saved notes.
 - Blind review that hides configuration labels.
-- Workspace with separate setup and run controls, experiment and unreviewed filters, adjustable image size, 48-image pagination, and two-image comparison that respects blind review. Unsaved review notes survive automatic refreshes within the page session.
+- Display preferences: locally bundled OpenDyslexic font, larger text, extra reading space, six color palettes, and dark/light/high-contrast appearances. Preferences stay in your browser. OpenDyslexic is by Abelardo Gonzalez, distributed under the [SIL Open Font License](comfyui_krea2_lab/web/OpenDyslexic-OFL.txt); [upstream source](https://github.com/antijingoist/opendyslexic).
+- Minimum-rating filtering and a one-click gallery filter reset.
+- Workspace with separate setup and run controls, experiment and unreviewed filters, adjustable image size, 48-image pagination, and comparison for 2–8 images with adjustable columns and zoom that respects blind review. Unsaved review notes survive automatic refreshes within the page session.
 - Filterable gallery and a collapsed, scrollable configuration leaderboard. Sort fastest or slowest by recorded generation time; configurations use mean time, and missing timings appear last. Exported voting galleries also support whole-run speed sorting. Timing depends on hardware, warm-up, caching, image dimensions and batch size.
 - JSON/CSV result exports.
 - Per-run standalone PHP voting-site exports with images, SQLite, community ratings, leaderboards and administration.

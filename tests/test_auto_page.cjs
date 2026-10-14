@@ -5,7 +5,7 @@ const html = fs.readFileSync('comfyui_krea2_lab/web/index.html', 'utf8');
 const elements = new Map();
 for (const match of html.matchAll(/<([a-z0-9]+)[^>]*id="([^"]+)"[^>]*>/g)) {
   const value = match[0].match(/value="([^"]*)"/)?.[1] || '';
-  elements.set(match[2], {value, checked:/\schecked(?:\s|>)/.test(match[0]), textContent: '', addEventListener() {}, options: []});
+  elements.set(match[2], {value, checked:/\schecked(?:\s|>)/.test(match[0]), textContent: '', style:{}, addEventListener() {}, options: []});
   if (match[1] === 'textarea') elements.get(match[2]).value = html.slice(match.index + match[0].length).split('</textarea>')[0];
 }
 const catalog = {krea_models:['krea2/a','krea2/b'],krea_loras:['krea2/l1','krea2/l2'],
@@ -14,7 +14,7 @@ const catalog = {krea_models:['krea2/a','krea2/b'],krea_loras:['krea2/l1','krea2
 const trial={id:'a'.repeat(64),settings:{lora:'krea2/l1',sampler:'euler',scheduler:'normal',graph:{'1':{inputs:{unet_name:'krea2/a'}}}},
   images:[{filename:'test.png',subfolder:'krea2_lab',type:'output'}],review:{},detector:{real:.85,ai:.15}};
 let backendPairs=[];
-const context = vm.createContext({document:{getElementById:id=>{assert(elements.has(id), 'Unknown UI element: '+id);return elements.get(id)},querySelector:()=>({addEventListener(){}})},
+const context = vm.createContext({document:{documentElement:{dataset:{},style:{}},getElementById:id=>{assert(elements.has(id), 'Unknown UI element: '+id);return elements.get(id)},querySelector:()=>({addEventListener(){}})},
   fetch:async (url,options)=>({ok:true,json:async()=>{if(url.endsWith('/pairs')){if(options?.method==='POST'){const data=JSON.parse(options.body);backendPairs=backendPairs.filter(([a,b])=>a!==data.sampler||b!==data.scheduler);if(data.disabled)backendPairs.push([data.sampler,data.scheduler])}return {disabled:backendPairs}}return url.endsWith('/catalog')?catalog:url.endsWith('/trials')?[trial]:url.endsWith('/sweep-status')?{total:100,index:10,succeeded:10,failed:0,status:'running',remaining_seconds:1800,estimated_finish_at:1791914400,timing_samples:3}:{}}}),
   setInterval(){},setTimeout,console,URLSearchParams,crypto:{randomUUID:()=> 'test'},localStorage:{getItem(){return null},setItem(){}}});
 vm.runInContext(html.split('<script>')[1].split('</script>')[0], context);
@@ -26,7 +26,7 @@ setTimeout(async()=>{
 
   vm.runInContext("trials=[{id:'one',settings:{experiment:'First',sampler:'euler',scheduler:'normal',lora:'A'},review:{},images:[{}]},{id:'two',settings:{experiment:'Second',sampler:'euler',scheduler:'normal',lora:'B'},review:{score:4},images:[{}]},{id:'three',settings:{experiment:'First',sampler:'euler',scheduler:'normal',lora:'C'},review:{},images:[{}]}];",context);
   vm.runInContext("toggleComparison('one');toggleComparison('two');toggleComparison('three')",context);
-  assert.equal(vm.runInContext('comparisonIds.size',context),2);
+  assert.equal(vm.runInContext('comparisonIds.size',context),3);
   assert.equal(elements.get('compareOpen').disabled,false);assert(elements.get('gallery').innerHTML.includes('data-compare'));
   elements.get('onlyUnrated').checked=true;vm.runInContext('render()',context);
   assert.equal(elements.get('count').textContent,2);vm.runInContext("noteDrafts.set('one','unsaved draft');render()",context);assert(elements.get('gallery').innerHTML.includes('unsaved draft'));
@@ -38,6 +38,21 @@ setTimeout(async()=>{
   assert.equal((elements.get('gallery').innerHTML.match(/<article /g)||[]).length,48);
   elements.get('loadMore').onclick();assert.equal((elements.get('gallery').innerHTML.match(/<article /g)||[]).length,60);
   vm.runInContext('trials=[];galleryLimit=48',context);await vm.runInContext('refresh()',context);
+  vm.runInContext("applyDisplay({readingFont:'dyslexic',uiTheme:'light',accentColor:'green',textSize:'18',roomyText:true})",context);
+  assert.equal(context.document.documentElement.dataset.font,'dyslexic');
+  assert.equal(context.document.documentElement.dataset.theme,'light');
+  assert.equal(context.document.documentElement.style.fontSize,'18px');
+  vm.runInContext("applyDisplay({uiTheme:'invalid',textSize:'900'})",context);
+  assert.equal(context.document.documentElement.dataset.theme,'dark');
+  assert.equal(context.document.documentElement.style.fontSize,'14px');
+  vm.runInContext("for(let i=0;i<10;i++)toggleComparison(String(i))",context);
+  assert.equal(vm.runInContext('comparisonIds.size',context),8);
+  elements.get('compareClear').onclick();
+  vm.runInContext("trials=[{id:'low',settings:{},review:{score:2},images:[{}]},{id:'high',settings:{},review:{score:5},images:[{}]}]",context);
+  elements.get('minimumScore').value='4';vm.runInContext('render()',context);
+  assert.equal(elements.get('count').textContent,1);
+  elements.get('resetFilters').onclick();assert.equal(elements.get('count').textContent,2);
+  await vm.runInContext('refresh()',context);
   elements.get('encoder').value=catalog.encoders[0];elements.get('vae').value=catalog.vaes[0];
   const graph=vm.runInContext('automaticGraph()',context);
   assert.equal(graph['1'].class_type,'Krea2LabSweep');
