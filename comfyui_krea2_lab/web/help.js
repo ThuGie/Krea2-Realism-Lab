@@ -74,9 +74,30 @@ const OPTION_HELP = {
   votingExport: ['Build voting website ZIP','Creates a self-contained snapshot with PHP, HTML, JavaScript, CSS, images, SQLite, administration and hosting instructions. Requires PHP 8.1+ and PDO_SQLITE on the host. Keep private/ outside the web root. Public votes start empty, and later generated images are not automatically added.']
 };
 
+const helpTooltip = document.getElementById('optionTooltip');
+function hideOptionTooltip(){if(helpTooltip.matches(':popover-open'))helpTooltip.hidePopover();}
+function showOptionTooltip(event){
+  const button=event.target.closest('[data-help]');
+  if(!button)return;
+  const help=OPTION_HELP[button.dataset.help];
+  if(!help)return;
+  helpTooltip.textContent=help[0]+': '+help[1];
+  button.setAttribute('aria-describedby','optionTooltip');
+  helpTooltip.showPopover();
+  const bounds=button.getBoundingClientRect(),box=helpTooltip.getBoundingClientRect();
+  helpTooltip.style.left=Math.max(8,Math.min(bounds.left,window.innerWidth-box.width-8))+'px';
+  helpTooltip.style.top=Math.max(8,bounds.bottom+8+box.height<=window.innerHeight?bounds.bottom+8:bounds.top-box.height-8)+'px';
+}
+document.addEventListener('pointerover',showOptionTooltip);
+document.addEventListener('focusin',showOptionTooltip);
+document.addEventListener('pointerout',event=>{if(event.target.closest('[data-help]'))hideOptionTooltip()});
+document.addEventListener('focusout',hideOptionTooltip);
+document.addEventListener('keydown',event=>{if(event.key==='Escape')hideOptionTooltip()});
+document.addEventListener('scroll',hideOptionTooltip,true);
 document.addEventListener('click', event => {
   const button = event.target.closest('[data-help]');
   if (!button) return;
+  hideOptionTooltip();
   event.preventDefault();
   event.stopPropagation();
   const help = OPTION_HELP[button.dataset.help];
